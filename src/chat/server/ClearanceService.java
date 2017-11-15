@@ -11,17 +11,17 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ClearanceService {
 
-	private Map<String, ClearanceLevel> clearanceLevelsForUsers = new ConcurrentHashMap<>();
+	private Map<User, ClearanceLevel> clearanceLevelsForUsers = new ConcurrentHashMap<>();
 
 	public ClearanceService(final File clearanceFile) {
 		loadClearanceLevels(clearanceFile);
 	}
 
-	public ClearanceLevel getClearanceLevelForUser(final String userDn) {
-		if (clearanceLevelsForUsers.containsKey(userDn)) {
-			return clearanceLevelsForUsers.get(userDn);
+	public ClearanceLevel getClearanceLevelForUser(final User user) {
+		if (clearanceLevelsForUsers.containsKey(user)) {
+			return clearanceLevelsForUsers.get(user);
 		} else {
-			throw new IllegalArgumentException("User is unknown: " + userDn);
+			throw new IllegalArgumentException("User is unknown: " + user.getUserDn());
 		}
 	}
 
@@ -35,7 +35,7 @@ public class ClearanceService {
 				while ((line = reader.readLine()) != null) {
 					final String key = line.substring(0, line.indexOf('='));
 					final String value = line.substring(line.indexOf('=') + 1);
-					clearanceLevelsForUsers.put(key, new ClearanceLevel(Integer.parseInt(value)));
+					clearanceLevelsForUsers.put(new User(key), new ClearanceLevel(Integer.parseInt(value)));
 				}
 			} catch (IOException e) {
 				throw new RuntimeException("Problem building ClearanceService from file: " + clearanceFile.getName(),

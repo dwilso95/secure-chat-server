@@ -12,16 +12,16 @@ import chat.message.ChatMessage;
 
 public class ServerThread implements Runnable, Closeable {
 
+	private static final long TIMEOUT = 60000L;
+	private User user;
 	private final Socket socket;
-	private final Queue<ChatMessage> messageQueue;
 	private final MessageVerifier messageVerifier;
 	private boolean runServerThread = true;
 
-	public ServerThread(final Socket socket, final Queue<ChatMessage> messageQueue,
-			final MessageVerifier messageVerifier) {
+	public ServerThread(final Socket socket, final MessageVerifier messageVerifier) {
 		this.socket = socket;
-		this.messageQueue = messageQueue;
 		this.messageVerifier = messageVerifier;
+		this.user = new User("someDn");
 	}
 
 	public void run() {
@@ -29,38 +29,46 @@ public class ServerThread implements Runnable, Closeable {
 				final BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));) {
 			Long lastMessageTime = System.currentTimeMillis();
 
+			authenticate(reader);
+
 			while (runServerThread) {
 				try {
+					final Queue<ChatMessage> currentMessages = MessageQueue.getInstance().getQueueForUser(user);
 					// while there are messages, write them
-
-					while (messageQueue.peek() != null) {
+					while (currentMessages.peek() != null) {
 						// check if this client is allowed to get message, then send
-						final ChatMessage message = messageQueue.poll();
+						final ChatMessage message = currentMessages.poll();
 						if (messageVerifier.verifyMessage(message)) {
-							System.out.println("SERVER WRITE");
 							pstream.println(message.getMessage());
 							pstream.flush();
 						}
 					}
-					final String line = reader.readLine();
-					lastMessageTime = System.currentTimeMillis();
-					// build and verify message first
-					// deserialize line for real
-					System.out.println("LINE " + line);
-					final ChatMessage message = new ChatMessage(line, new ClearanceLevel(2), "someDN");
-					messageQueue.add(message);
-
-					if (System.currentTimeMillis() - lastMessageTime > 60000) {
+					String line;
+					if (socket.getInputStream().available() > 0 && (line = reader.readLine()) != null) {
+						lastMessageTime = System.currentTimeMillis();
+						// build and verify message first
+						// deserialize line for real
+						MessageQueue.getInstance().addMessageToQueues(ChatMessage.fromXML(line));
+					}
+					if (System.currentTimeMillis() - lastMessageTime > TIMEOUT) {
 						runServerThread = false;
 					}
 				} catch (IOException e) {
-					System.out.println(e);
+					e.printStackTrace();
 					runServerThread = false;
 				}
 			}
 		} catch (IOException e) {
-			System.out.println(e);
+			e.printStackTrace();
 			runServerThread = false;
+		}
+	}
+
+	private void authenticate(final BufferedReader reader) throws IOException {
+		String line;
+		while ((line = reader.readLine()) != null) {
+			this.user = new User(line);
+			break;
 		}
 	}
 

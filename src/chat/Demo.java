@@ -17,10 +17,22 @@ public class Demo {
 		System.out.println("Server started");
 
 		// run clients...
-		Client client = new Client(new ClientContext(new File("contexts/client.context")));
-		new Thread(client).start();
-		System.out.println("Client started");
-		// see what happens...
+		Client client1 = new Client(new ClientContext(new File("contexts/client1.context")));
+		new Thread(client1).start();
+		System.out.println("Client 1 started");
+
+		Client client2 = new Client(new ClientContext(new File("contexts/client2.context")));
+		new Thread(client2).start();
+		System.out.println("Client 2 started");
+
+		Client client3 = new Client(new ClientContext(new File("contexts/client3.context")));
+		new Thread(client3).start();
+		System.out.println("Client 3 started");
+
+		while (true) {
+			Thread.sleep(2000L);
+			client1.write("message", 2);
+		}
 
 		// add certs
 

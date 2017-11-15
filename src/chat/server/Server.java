@@ -3,19 +3,15 @@ package chat.server;
 import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
-import chat.message.ChatMessage;
 
 public class Server implements Runnable {
 
 	private ServerSocket socketServer;
 	private ClearanceService clearanceService;
-	private List<ServerThread> serverThreads = new ArrayList<>();
-	private Queue<ChatMessage> messageQueue = new ConcurrentLinkedQueue<>();
+	private List<Thread> serverThreads = new ArrayList<>();
 
 	public Server(final ServerContext serverContext) {
 		try {
@@ -31,13 +27,13 @@ public class Server implements Runnable {
 	@Override
 	public void run() {
 		while (true) {
-			try (final ServerThread serverThread = new ServerThread(this.socketServer.accept(), messageQueue,
-					new MessageVerifier(clearanceService));) {
-				System.out.println("Running server thread");
-				serverThread.run();
+			try {
+				final Socket socket = this.socketServer.accept();
+				final Thread serverThread = new Thread(new ServerThread(socket, new MessageVerifier(clearanceService)));
+				serverThread.start();
 				serverThreads.add(serverThread);
 			} catch (IOException e) {
-				// TODO log error once logging is set up!
+				System.out.println("Problem creating server thread for client connection...");
 				e.printStackTrace();
 			}
 		}

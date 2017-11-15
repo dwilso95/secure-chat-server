@@ -11,14 +11,16 @@ public class MessageVerifier {
 	}
 
 	public boolean verifyMessage(final ChatMessage chatMessage) {
-		final ClearanceLevel userClearanceLevel = clearanceService.getClearanceLevelForUser(chatMessage.getUserDn());
-		final ClearanceLevel messageClearanceLevel = chatMessage.getClearanceLevel();
+		if (chatMessage != null) {
+			final ClearanceLevel userClearanceLevel = clearanceService
+					.getClearanceLevelForUser(new User(chatMessage.getUserDn()));
+			final ClearanceLevel messageClearanceLevel = chatMessage.getClearanceLevel();
 
-		if (userClearanceLevel.getLevel() >= messageClearanceLevel.getLevel()) {
-			return true;
-		} else {
-			return false;
+			if (userClearanceLevel.getLevel() >= messageClearanceLevel.getLevel()) {
+				return true;
+			}
 		}
+		return false;
 	}
 
 }

@@ -1,62 +1,53 @@
 package chat.client;
 
-import java.io.BufferedReader;
 import java.io.Closeable;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
+
+import chat.message.ChatMessage;
+import chat.server.ClearanceLevel;
 
 public class Client implements Runnable, Closeable {
 
-	private final BufferedReader reader;
-	private final DataOutputStream out;
 	private final Socket socket;
-	private boolean runClient = true;
+	private final PrintWriter writer;
+	private MessageSender sender;
+	private MessageReceiver receiver;
+	private final String dn;
 
 	public Client(final ClientContext clientContext) throws Exception {
 		this.socket = new Socket(clientContext.getProperty("ip"), Integer.parseInt(clientContext.getProperty("port")));
-		this.out = new DataOutputStream(socket.getOutputStream());
-		this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		this.dn = clientContext.getProperty("dn");
+		this.writer = new PrintWriter(this.socket.getOutputStream(), true);
+		this.sender = new MessageSender(this.writer, this.dn);
+		this.receiver = new MessageReceiver(this.socket, this.dn);
 	}
 
-	int i = 0;
-
-	public final void write() throws IOException {
-		out.writeUTF("CHATTING " + i++);
-		out.flush();
+	public final void write(final String message, final int level) throws IOException {
+		this.sender.send(new ChatMessage(message, new ClearanceLevel(level), dn));
 	}
 
-	public final void read() throws IOException {
-		System.out.println("!");
-		String line = reader.readLine();
-		System.out.println("!!!!");
-		if (line != null && !line.isEmpty()) {
-			System.out.println("Client " + line);
-		}
+	public final void write(final ChatMessage chatMessage) throws IOException {
+		this.sender.send(chatMessage);
+	}
 
+	private void authenticate() {
+		writer.println(dn);
 	}
 
 	@Override
 	public void run() {
-		System.out.println("Client started");
-		while (runClient) {
-			try {
-				System.out.println("Client write");
-				write();
-				System.out.println("Client read");
-				read();
-			} catch (IOException e) {
-				runClient = false;
-				e.printStackTrace();
-			}
-		}
+		authenticate();
+
+		new Thread(this.sender).start();
+		new Thread(this.receiver).start();
 	}
 
 	@Override
 	public void close() throws IOException {
-		this.out.close();
-		this.reader.close();
+		this.sender.close();
+		this.receiver.close();
 		this.socket.close();
 	}
 
