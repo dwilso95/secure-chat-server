@@ -33,6 +33,7 @@ public class Server implements Runnable {
 		while (true) {
 			try (final ServerThread serverThread = new ServerThread(this.socketServer.accept(), messageQueue,
 					new MessageVerifier(clearanceService));) {
+				System.out.println("Running server thread");
 				serverThread.run();
 				serverThreads.add(serverThread);
 			} catch (IOException e) {

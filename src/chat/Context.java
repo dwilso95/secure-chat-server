@@ -20,7 +20,7 @@ public abstract class Context {
 			String line;
 			while ((line = reader.readLine()) != null) {
 				final String key = line.substring(0, line.indexOf('='));
-				final String value = line.substring(line.indexOf('='));
+				final String value = line.substring(line.indexOf('=') + 1);
 				properties.put(key, value);
 			}
 		}

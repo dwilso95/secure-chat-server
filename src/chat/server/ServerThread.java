@@ -37,18 +37,18 @@ public class ServerThread implements Runnable, Closeable {
 						// check if this client is allowed to get message, then send
 						final ChatMessage message = messageQueue.poll();
 						if (messageVerifier.verifyMessage(message)) {
+							System.out.println("SERVER WRITE");
 							pstream.println(message.getMessage());
+							pstream.flush();
 						}
 					}
-
-					String line;
-					while ((line = reader.readLine()) != null) {
-						lastMessageTime = System.currentTimeMillis();
-						// build and verify message first
-						// deserialize line for real
-						final ChatMessage message = new ChatMessage(line, new ClearanceLevel(2), "someDN");
-						messageQueue.add(message);
-					}
+					final String line = reader.readLine();
+					lastMessageTime = System.currentTimeMillis();
+					// build and verify message first
+					// deserialize line for real
+					System.out.println("LINE " + line);
+					final ChatMessage message = new ChatMessage(line, new ClearanceLevel(2), "someDN");
+					messageQueue.add(message);
 
 					if (System.currentTimeMillis() - lastMessageTime > 60000) {
 						runServerThread = false;
