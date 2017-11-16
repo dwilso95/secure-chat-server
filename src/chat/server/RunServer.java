@@ -8,8 +8,10 @@ public class RunServer {
 		if (args.length != 1) {
 			throw new IllegalArgumentException("Cannot run server. Must provide one argument.");
 		}
+		
+		System.out.println("Starting Server");
 
-		new Server(new ServerContext(new File(args[0])));
+		new Server(new ServerContext(new File(args[0]))).run();
 	}
 
 }

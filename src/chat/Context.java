@@ -19,8 +19,15 @@ public abstract class Context {
 				new InputStreamReader(new FileInputStream(contextLocation), Charset.forName("UTF-8")));) {
 			String line;
 			while ((line = reader.readLine()) != null) {
-				final String key = line.substring(0, line.indexOf('='));
-				final String value = line.substring(line.indexOf('=') + 1);
+				final String key;
+				final String value;
+				if (line.startsWith("\"")) {
+					key = line.substring(1, line.indexOf("\"="));
+					value = line.substring(line.indexOf("=\""), line.lastIndexOf('"'));
+				} else {
+					key = line.substring(0, line.indexOf('='));
+					value = line.substring(line.indexOf('=') + 1);
+				}
 				properties.put(key, value);
 			}
 		}

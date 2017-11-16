@@ -2,30 +2,38 @@ package chat.client;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.Socket;
 
+import javax.net.ssl.SSLSocket;
+
+import chat.SSLFactory;
+import chat.clearance.ClearanceLevel;
 import chat.message.ChatMessage;
-import chat.server.ClearanceLevel;
+import chat.server.User;
 
 public class Client implements Runnable, Closeable {
 
-	private final Socket socket;
-	private final PrintWriter writer;
+	private final SSLSocket socket;
 	private MessageSender sender;
 	private MessageReceiver receiver;
-	private final String dn;
+	private User user;
 
 	public Client(final ClientContext clientContext) throws Exception {
-		this.socket = new Socket(clientContext.getProperty("ip"), Integer.parseInt(clientContext.getProperty("port")));
-		this.dn = clientContext.getProperty("dn");
-		this.writer = new PrintWriter(this.socket.getOutputStream(), true);
-		this.sender = new MessageSender(this.writer, this.dn);
-		this.receiver = new MessageReceiver(this.socket, this.dn);
+		this.socket = SSLFactory.getSSLSocket(clientContext);
+		this.sender = new MessageSender(this.socket);
+		this.receiver = new MessageReceiver(this.socket);
+		this.user = new User(clientContext.getProperty("dn"));
+	}
+
+	public final boolean hasMore() {
+		return this.receiver.hasMore();
+	}
+
+	public final ChatMessage read() {
+		return this.receiver.read();
 	}
 
 	public final void write(final String message, final int level) throws IOException {
-		this.sender.send(new ChatMessage(message, new ClearanceLevel(level), dn));
+		this.write(new ChatMessage(message, new ClearanceLevel(level), "signature", user.getUserDn()));
 	}
 
 	public final void write(final ChatMessage chatMessage) throws IOException {
@@ -33,21 +41,24 @@ public class Client implements Runnable, Closeable {
 	}
 
 	private void authenticate() {
-		writer.println(dn);
+		try {
+			this.socket.startHandshake();
+		} catch (IOException e) {
+			throw new RuntimeException("Problem handshaking with server.", e);
+		}
 	}
 
 	@Override
 	public void run() {
 		authenticate();
-
-		new Thread(this.sender).start();
-		new Thread(this.receiver).start();
+		this.sender.start();
+		this.receiver.start();
 	}
 
 	@Override
 	public void close() throws IOException {
-		this.sender.close();
 		this.receiver.close();
+		this.sender.close();
 		this.socket.close();
 	}
 

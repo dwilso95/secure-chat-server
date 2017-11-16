@@ -31,10 +31,9 @@ public final class MessageQueue {
 		return messageQueueByUser.get(user);
 	}
 
-	public void addMessageToQueues(final ChatMessage chatMessage) {
-		final User user = new User(chatMessage.getUserDn());
+	public void addMessageToQueues(final ChatMessage chatMessage, final User sender) {
 		for (final Entry<User, Queue<ChatMessage>> entry : messageQueueByUser.entrySet()) {
-			if (!entry.getKey().equals(user)) {
+			if (!entry.getKey().equals(sender)) {
 				entry.getValue().add(chatMessage);
 			}
 		}

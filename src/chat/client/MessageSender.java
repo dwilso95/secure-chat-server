@@ -3,34 +3,36 @@ package chat.client;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import chat.message.ChatMessage;
 
-public class MessageSender implements Runnable, Closeable {
+public class MessageSender extends Thread implements Closeable {
 
 	private final PrintWriter writer;
-	private final String dn;
 	private final Queue<ChatMessage> messagesToWrite = new ConcurrentLinkedQueue<>();
+	private boolean runSender = true;
 
-	public MessageSender(final PrintWriter writer, final String dn) throws Exception {
-		this.writer = writer;
-		this.dn = dn;
+	public MessageSender(final Socket socket) throws Exception {
+		this.writer = new PrintWriter(socket.getOutputStream(), true);
 	}
 
 	public void send(final ChatMessage chatMessage) {
-		messagesToWrite.add(chatMessage);
+		this.messagesToWrite.add(chatMessage);
 	}
 
 	@Override
 	public void run() {
 		try {
-			while (true) {
-				if (messagesToWrite.peek() != null) {
-					final ChatMessage message = messagesToWrite.poll();
-					System.out.println("Client [" + dn + "] writing: " + ChatMessage.toXML(message));
-					writer.println(ChatMessage.toXML(message));
+			while (this.runSender) {
+				if (this.messagesToWrite.peek() != null) {
+					final ChatMessage chatMessage = messagesToWrite.poll();
+					// System.out.println("Client [" + dn + "] writing: " + chatMessage.getMessage()
+					// + " with level: "
+					// + chatMessage.getClearanceLevel());
+					this.writer.println(ChatMessage.toXML(chatMessage));
 				}
 			}
 		} catch (Exception e) {
@@ -40,7 +42,7 @@ public class MessageSender implements Runnable, Closeable {
 
 	@Override
 	public void close() throws IOException {
-		this.writer.close();
+		this.runSender = false;
 	}
 
 }

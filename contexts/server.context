@@ -1,2 +1,6 @@
 port=5000
 clearance.file=contexts/clearance.context
+timeout=20000
+keystore=server/stores/server_ks.jks
+truststore=server/stores/server_ts.jks
+password=server

@@ -1,6 +1,9 @@
 package chat;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import chat.client.Client;
 import chat.client.ClientContext;
@@ -29,13 +32,17 @@ public class Demo {
 		new Thread(client3).start();
 		System.out.println("Client 3 started");
 
+		List<Client> clients = new ArrayList<>();
+		clients.add(client1);
+		clients.add(client2);
+		clients.add(client3);
+
 		while (true) {
 			Thread.sleep(2000L);
-			client1.write("message", 2);
+			clients.get(new Random().nextInt(3)).write("secret message", 2);
 		}
 
 		// add certs
 
 	}
-
 }

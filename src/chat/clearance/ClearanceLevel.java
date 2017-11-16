@@ -1,4 +1,4 @@
-package chat.server;
+package chat.clearance;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -20,6 +20,10 @@ public class ClearanceLevel {
 	@XmlElement
 	public int getLevel() {
 		return level;
+	}
+
+	public void setLevel(final int level) {
+		this.level = level;
 	}
 
 	private void validateLevel(final int level) {

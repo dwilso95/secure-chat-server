@@ -1,4 +1,4 @@
-package chat.server;
+package chat.clearance;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,9 +9,11 @@ import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import chat.server.User;
+
 public class ClearanceService {
 
-	private Map<User, ClearanceLevel> clearanceLevelsForUsers = new ConcurrentHashMap<>();
+	private final Map<User, ClearanceLevel> clearanceLevelsForUsers = new ConcurrentHashMap<>();
 
 	public ClearanceService(final File clearanceFile) {
 		loadClearanceLevels(clearanceFile);
@@ -33,8 +35,8 @@ public class ClearanceService {
 					new InputStreamReader(new FileInputStream(clearanceFile), Charset.forName("UTF-8")));) {
 				String line;
 				while ((line = reader.readLine()) != null) {
-					final String key = line.substring(0, line.indexOf('='));
-					final String value = line.substring(line.indexOf('=') + 1);
+					final String key = line.substring(0, line.lastIndexOf('='));
+					final String value = line.substring(line.lastIndexOf('=') + 1);
 					clearanceLevelsForUsers.put(new User(key), new ClearanceLevel(Integer.parseInt(value)));
 				}
 			} catch (IOException e) {

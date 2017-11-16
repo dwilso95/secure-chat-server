@@ -1,2 +1,5 @@
+"dn"="CN=Client 1, OU=APL, O=JHU, L=Laurel, ST=Maryland, C=US=4"
 port=5000
-dn=dn1
+keystore=client/stores/client1_ks.jks
+truststore=client/stores/client1_ts.jks
+password=client1

@@ -10,41 +10,52 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import chat.server.ClearanceLevel;
+import chat.clearance.ClearanceLevel;
 
 @XmlRootElement
 public class ChatMessage {
 
 	private String message;
 	private ClearanceLevel clearanceLevel;
+	private String signature;
 	private String userDn;
 
 	public ChatMessage() {
 
 	}
 
-	public ChatMessage(final String message, final ClearanceLevel clearanceLevel, final String userDn) {
+	public ChatMessage(final String message, final ClearanceLevel clearanceLevel, final String signature,
+			final String userDn) {
 		this.message = message;
 		this.clearanceLevel = clearanceLevel;
-		this.setUserDn(userDn);
+		this.signature = signature;
 	}
 
 	@XmlElement
-	public String getMessage() {
+	public final String getMessage() {
 		return message;
 	}
 
-	public void setMessage(String message) {
+	public final void setMessage(String message) {
 		this.message = message;
 	}
 
 	@XmlElement
-	public ClearanceLevel getClearanceLevel() {
+	public final ClearanceLevel getClearanceLevel() {
 		return clearanceLevel;
 	}
 
-	public void setClearanceLevel(ClearanceLevel clearanceLevel) {
+	public final void setClearanceLevel(ClearanceLevel clearanceLevel) {
 		this.clearanceLevel = clearanceLevel;
+	}
+
+	@XmlElement
+	public final String getSignature() {
+		return signature;
+	}
+
+	public void setSignature(final String signature) {
+		this.signature = signature;
 	}
 
 	@XmlElement
@@ -56,8 +67,7 @@ public class ChatMessage {
 		this.userDn = userDn;
 	}
 
-	public static String toXML(final ChatMessage chatMessage) {
-
+	public static final String toXML(final ChatMessage chatMessage) {
 		try {
 			final JAXBContext jaxbContext = JAXBContext.newInstance(ChatMessage.class);
 			final Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
@@ -70,7 +80,7 @@ public class ChatMessage {
 		}
 	}
 
-	public static ChatMessage fromXML(final String chatMessageXML) {
+	public static final ChatMessage fromXML(final String chatMessageXML) {
 		try {
 			final JAXBContext jaxbContext = JAXBContext.newInstance(ChatMessage.class);
 			final Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
