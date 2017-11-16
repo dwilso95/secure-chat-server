@@ -22,8 +22,8 @@ public abstract class Context {
 				final String key;
 				final String value;
 				if (line.startsWith("\"")) {
-					key = line.substring(1, line.indexOf("\"="));
-					value = line.substring(line.indexOf("=\""), line.lastIndexOf('"'));
+					key = line.substring(1, line.indexOf("\"", 1));
+					value = line.substring(line.indexOf("=\"") + 2, line.lastIndexOf('"'));
 				} else {
 					key = line.substring(0, line.indexOf('='));
 					value = line.substring(line.indexOf('=') + 1);

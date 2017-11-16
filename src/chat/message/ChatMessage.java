@@ -29,6 +29,7 @@ public class ChatMessage {
 		this.message = message;
 		this.clearanceLevel = clearanceLevel;
 		this.signature = signature;
+		this.userDn = userDn;
 	}
 
 	@XmlElement

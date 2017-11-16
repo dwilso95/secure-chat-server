@@ -36,7 +36,8 @@ public class MessageReceiver extends Thread implements Closeable {
 				while ((line = reader.readLine()) != null) {
 					final ChatMessage chatMessage = ChatMessage.fromXML(line);
 					receivedMessages.add(chatMessage);
-					System.out.println("Receieved: " + chatMessage.getMessage());
+					System.out.println(chatMessage.getUserDn() + "@" + chatMessage.getClearanceLevel().getLevel()
+							+ " says: " + chatMessage.getMessage());
 				}
 			} catch (IOException e) {
 				runReceiver = false;
