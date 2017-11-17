@@ -1,6 +1,5 @@
 package chat;
 
-import java.io.FileInputStream;
 import java.security.KeyStore;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -28,22 +27,17 @@ public class SSLFactory {
 	}
 
 	public static final SSLSocket getSSLSocket(final Context context) throws Exception {
-		final SSLSocketFactory ssf = getSSLContext(context).getSocketFactory();
-		return (SSLSocket) ssf.createSocket(context.getProperty("ip"), Integer.parseInt(context.getProperty("port")));
+		final SSLSocketFactory sslSocketFactory = getSSLContext(context).getSocketFactory();
+		return (SSLSocket) sslSocketFactory.createSocket(context.getProperty("ip"),
+				Integer.parseInt(context.getProperty("port")));
 	}
 
 	private static final SSLContext getSSLContext(final Context context) throws Exception {
-		final KeyStore keystore = KeyStore.getInstance("JKS");
-		keystore.load(new FileInputStream(context.getProperty("keystore")),
-				context.getProperty("password").toCharArray());
-
+		final KeyStore keystore = KeyStoreFactory.createKeyStore(context);
 		final KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
 		keyManagerFactory.init(keystore, context.getProperty("password").toCharArray());
 
-		final KeyStore trustStore = KeyStore.getInstance("JKS");
-		trustStore.load(new FileInputStream(context.getProperty("truststore")),
-				context.getProperty("password").toCharArray());
-
+		final KeyStore trustStore = KeyStoreFactory.createTrustStore(context);
 		final TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance("SunX509");
 		trustManagerFactory.init(trustStore);
 

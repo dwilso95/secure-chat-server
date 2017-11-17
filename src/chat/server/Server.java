@@ -1,7 +1,6 @@
 package chat.server;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,11 +34,11 @@ public class Server implements Runnable {
 		while (true) {
 			try {
 				final SSLSocket socket = (SSLSocket) this.secureSocketServer.accept();
-				final Thread serverThread = new Thread(
-						new ServerThread(socket, new MessageVerifier(this.clearanceService), this.serverContext));
+				final Thread serverThread = new ServerThread(socket, new MessageVerifier(this.clearanceService),
+						this.serverContext);
 				serverThread.start();
 				this.serverThreads.add(serverThread);
-			} catch (IOException e) {
+			} catch (Exception e) {
 				throw new RuntimeException("Problem creating server thread for client connection...", e);
 			}
 		}

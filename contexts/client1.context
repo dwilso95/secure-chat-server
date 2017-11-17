@@ -3,3 +3,4 @@ port=5000
 keystore=client/stores/client1_ks.jks
 truststore=client/stores/client1_ts.jks
 password=client1
+alias=client1

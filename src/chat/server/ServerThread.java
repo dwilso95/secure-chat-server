@@ -5,6 +5,9 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.Signature;
 import java.time.ZonedDateTime;
 import java.util.Queue;
 import java.util.logging.FileHandler;
@@ -14,9 +17,10 @@ import java.util.logging.SimpleFormatter;
 
 import javax.net.ssl.SSLSocket;
 
+import chat.SignatureFactory;
 import chat.message.ChatMessage;
 
-public class ServerThread implements Runnable, Closeable {
+public class ServerThread extends Thread implements Runnable, Closeable {
 
 	private static final Logger LOGGER = Logger.getLogger(ServerThread.class.getName());
 
@@ -36,16 +40,19 @@ public class ServerThread implements Runnable, Closeable {
 	private final BufferedReader reader;
 	private final PrintStream writer;
 	private User user;
+	private Signature signature;
 	private boolean runServerThread = true;
 
 	public ServerThread(final SSLSocket socket, final MessageVerifier messageVerifier,
-			final ServerContext serverContext) throws IOException {
+			final ServerContext serverContext) throws IOException, InvalidKeyException, NoSuchAlgorithmException {
 		this.socket = socket;
 		this.messageVerifier = messageVerifier;
 		this.user = new User(socket.getSession().getPeerPrincipal().toString());
 		this.timeout = Long.parseLong(serverContext.getProperty("timeout"));
 		this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		this.writer = new PrintStream(socket.getOutputStream());
+		this.signature = SignatureFactory
+				.createSignatureForVerification(socket.getSession().getPeerCertificateChain()[0].getPublicKey());
 	}
 
 	public void run() {
@@ -80,7 +87,9 @@ public class ServerThread implements Runnable, Closeable {
 						final ChatMessage chatMessage = ChatMessage.fromXML(line);
 						// we can check if the user could send this message by just checking if the user
 						// could receive this message
-						if (messageVerifier.verifyMessageDestination(chatMessage, user)) {
+						System.out.println(messageVerifier.verifyMessageSource(chatMessage, signature));
+						if (messageVerifier.verifyMessageSource(chatMessage, signature)
+								&& messageVerifier.verifyMessageDestination(chatMessage, user)) {
 							MessageQueue.getInstance().addMessageToQueues(chatMessage, user);
 						}
 					}

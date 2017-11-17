@@ -1,5 +1,9 @@
 package chat.server;
 
+import java.security.Signature;
+import java.security.SignatureException;
+import java.util.Base64;
+
 import chat.clearance.ClearanceLevel;
 import chat.clearance.ClearanceService;
 import chat.message.ChatMessage;
@@ -34,10 +38,15 @@ public class MessageVerifier {
 		return false;
 	}
 
-	public boolean verifyMessageSource(final ChatMessage chatMessage, final User sourceUser) {
-		if (chatMessage != null && sourceUser != null) {
+	public boolean verifyMessageSource(final ChatMessage chatMessage, final Signature signature) {
+		if (chatMessage != null && signature != null) {
 			// verify signature
-			return true;
+			try {
+				signature.update(chatMessage.getMessage().getBytes());
+				return signature.verify(Base64.getDecoder().decode(chatMessage.getSignature()));
+			} catch (SignatureException e) {
+				e.printStackTrace();
+			}
 		}
 		return false;
 	}
