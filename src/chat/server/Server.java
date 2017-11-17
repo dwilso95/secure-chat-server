@@ -7,17 +7,18 @@ import java.util.List;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLSocket;
 
+import chat.ChatContext;
 import chat.SSLFactory;
 import chat.clearance.ClearanceService;
 
 public class Server implements Runnable {
 
-	private final ServerContext serverContext;
+	private final ChatContext serverContext;
 	private final SSLServerSocket secureSocketServer;
 	private final ClearanceService clearanceService;
 	private final List<Thread> serverThreads = new ArrayList<>();
 
-	public Server(final ServerContext serverContext) {
+	public Server(final ChatContext serverContext) {
 		try {
 			this.clearanceService = new ClearanceService(new File(serverContext.getProperty("clearance.file")));
 			this.serverContext = serverContext;

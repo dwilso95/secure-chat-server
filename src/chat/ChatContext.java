@@ -10,11 +10,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class Context {
+/**
+ * Handles reading reading properties for the chat server and client from a
+ * file.
+ */
+public class ChatContext {
 
 	private final Map<String, String> properties = new HashMap<>();
 
-	public Context(final File contextLocation) throws IOException {
+	public ChatContext(final File contextLocation) throws IOException {
 		try (final BufferedReader reader = new BufferedReader(
 				new InputStreamReader(new FileInputStream(contextLocation), Charset.forName("UTF-8")));) {
 			String line;

@@ -3,14 +3,20 @@ package chat.client;
 import java.io.File;
 import java.util.Scanner;
 
+import chat.ChatContext;
+
+/**
+ * Main method for executing a chat {@link Client}
+ */
 public class RunClient {
 
 	public static void main(String[] args) throws Exception {
 		if (args.length != 1) {
-			throw new IllegalArgumentException("Cannot run client. Must provide one argument.");
+			throw new IllegalArgumentException(
+					"Cannot run client. Must provide one argument for the location of a chat context.");
 		}
 
-		try (final Client client = new Client(new ClientContext(new File(args[0])));) {
+		try (final Client client = new Client(new ChatContext(new File(args[0])));) {
 			new Thread(client).start();
 
 			boolean runClient = true;

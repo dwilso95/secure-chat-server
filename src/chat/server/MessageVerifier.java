@@ -38,7 +38,17 @@ public class MessageVerifier {
 		return false;
 	}
 
-	public boolean verifyMessageSource(final ChatMessage chatMessage, final Signature signature) {
+	/**
+	 * Verifies the given message with the given {@link Signature}
+	 * 
+	 * @param chatMessage
+	 *            - {@link ChatMessage} to verify
+	 * @param signature
+	 *            - {@link Signature} to use to verify
+	 * @return - true iff the {@link Signature} verifies the {@link ChatMessage},
+	 *         else false
+	 */
+	public boolean verifyMessageSignature(final ChatMessage chatMessage, final Signature signature) {
 		if (chatMessage != null && signature != null) {
 			// verify signature
 			try {

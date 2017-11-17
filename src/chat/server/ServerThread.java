@@ -17,6 +17,7 @@ import java.util.logging.SimpleFormatter;
 
 import javax.net.ssl.SSLSocket;
 
+import chat.ChatContext;
 import chat.SignatureFactory;
 import chat.message.ChatMessage;
 
@@ -43,8 +44,8 @@ public class ServerThread extends Thread implements Runnable, Closeable {
 	private Signature signature;
 	private boolean runServerThread = true;
 
-	public ServerThread(final SSLSocket socket, final MessageVerifier messageVerifier,
-			final ServerContext serverContext) throws IOException, InvalidKeyException, NoSuchAlgorithmException {
+	public ServerThread(final SSLSocket socket, final MessageVerifier messageVerifier, final ChatContext serverContext)
+			throws IOException, InvalidKeyException, NoSuchAlgorithmException {
 		this.socket = socket;
 		this.messageVerifier = messageVerifier;
 		this.user = new User(socket.getSession().getPeerPrincipal().toString());
@@ -87,8 +88,8 @@ public class ServerThread extends Thread implements Runnable, Closeable {
 						final ChatMessage chatMessage = ChatMessage.fromXML(line);
 						// we can check if the user could send this message by just checking if the user
 						// could receive this message
-						System.out.println(messageVerifier.verifyMessageSource(chatMessage, signature));
-						if (messageVerifier.verifyMessageSource(chatMessage, signature)
+						System.out.println(messageVerifier.verifyMessageSignature(chatMessage, signature));
+						if (messageVerifier.verifyMessageSignature(chatMessage, signature)
 								&& messageVerifier.verifyMessageDestination(chatMessage, user)) {
 							MessageQueue.getInstance().addMessageToQueues(chatMessage, user);
 						}

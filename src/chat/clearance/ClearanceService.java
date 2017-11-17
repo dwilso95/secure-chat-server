@@ -11,14 +11,32 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import chat.server.User;
 
+/**
+ * Handles {@link ClearanceLevel}s of {@link User}s.
+ */
 public class ClearanceService {
 
 	private final Map<User, ClearanceLevel> clearanceLevelsForUsers = new ConcurrentHashMap<>();
 
+	/**
+	 * Creates a {@link ClearanceService} using the given {@link File}
+	 * 
+	 * File must be formatted as key=value.
+	 * 
+	 * @param clearanceFile
+	 *            - {@link File} from which to load users and clearances
+	 */
 	public ClearanceService(final File clearanceFile) {
 		loadClearanceLevels(clearanceFile);
 	}
 
+	/**
+	 * Returns {@link ClearanceLevel} for the given {@link User}
+	 * 
+	 * @param user
+	 *            - {@link User} for which to return {@link ClearanceLevel}
+	 * @return - {@link ClearanceLevel}
+	 */
 	public ClearanceLevel getClearanceLevelForUser(final User user) {
 		if (clearanceLevelsForUsers.containsKey(user)) {
 			return clearanceLevelsForUsers.get(user);

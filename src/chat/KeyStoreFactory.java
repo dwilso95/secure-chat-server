@@ -9,6 +9,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 
+/**
+ * Builds {@link KeyStore}s of type key and trust.
+ */
 public class KeyStoreFactory {
 
 	/**
@@ -18,17 +21,17 @@ public class KeyStoreFactory {
 		// do nothing
 	}
 
-	public static final KeyStore createKeyStore(final Context context) throws NoSuchAlgorithmException,
+	public static final KeyStore createKeyStore(final ChatContext context) throws NoSuchAlgorithmException,
 			CertificateException, FileNotFoundException, IOException, KeyStoreException, UnrecoverableKeyException {
 		return createStore(context, "keystore");
 	}
 
-	public static final KeyStore createTrustStore(final Context context) throws NoSuchAlgorithmException,
+	public static final KeyStore createTrustStore(final ChatContext context) throws NoSuchAlgorithmException,
 			CertificateException, FileNotFoundException, IOException, KeyStoreException, UnrecoverableKeyException {
 		return createStore(context, "truststore");
 	}
 
-	private static final KeyStore createStore(final Context context, final String type) throws KeyStoreException,
+	private static final KeyStore createStore(final ChatContext context, final String type) throws KeyStoreException,
 			NoSuchAlgorithmException, CertificateException, FileNotFoundException, IOException {
 		final KeyStore keystore = KeyStore.getInstance("JKS");
 		keystore.load(new FileInputStream(context.getProperty(type)), context.getProperty("password").toCharArray());

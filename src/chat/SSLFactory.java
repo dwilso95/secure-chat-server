@@ -20,19 +20,35 @@ public class SSLFactory {
 		// do nothing
 	}
 
-	public static final SSLServerSocket getSSLSocketServer(final Context context) throws Exception {
+	/**
+	 * Generates a {@link SSLServerSocket} using the supplied context
+	 * 
+	 * @param context
+	 *            - {@link ChatContext}
+	 * @return {@link SSLServerSocket}
+	 * @throws Exception
+	 */
+	public static final SSLServerSocket getSSLSocketServer(final ChatContext context) throws Exception {
 		final SSLServerSocketFactory secureServerSocketFactory = getSSLContext(context).getServerSocketFactory();
 		return (SSLServerSocket) secureServerSocketFactory
 				.createServerSocket(Integer.parseInt(context.getProperty("port")));
 	}
 
-	public static final SSLSocket getSSLSocket(final Context context) throws Exception {
+	/**
+	 * Generates a {@link SSLSocket} using the supplied context
+	 * 
+	 * @param context
+	 *            - {@link ChatContext}
+	 * @return {@link SSLSocket}
+	 * @throws Exception
+	 */
+	public static final SSLSocket getSSLSocket(final ChatContext context) throws Exception {
 		final SSLSocketFactory sslSocketFactory = getSSLContext(context).getSocketFactory();
 		return (SSLSocket) sslSocketFactory.createSocket(context.getProperty("ip"),
 				Integer.parseInt(context.getProperty("port")));
 	}
 
-	private static final SSLContext getSSLContext(final Context context) throws Exception {
+	private static final SSLContext getSSLContext(final ChatContext context) throws Exception {
 		final KeyStore keystore = KeyStoreFactory.createKeyStore(context);
 		final KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
 		keyManagerFactory.init(keystore, context.getProperty("password").toCharArray());

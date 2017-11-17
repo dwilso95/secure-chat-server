@@ -5,27 +5,26 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import chat.message.ChatMessage;
 
+/**
+ * Thread for reading {@link ChatMessage}s from the chat server and prints it to
+ * the console.
+ */
 public class MessageReceiver extends Thread implements Closeable {
 
 	private final BufferedReader reader;
-	private final Queue<ChatMessage> receivedMessages = new ConcurrentLinkedQueue<>();
 	private boolean runReceiver = true;
 
+	/**
+	 * Creates an instance which reads from the given socket
+	 * 
+	 * @param socket
+	 * @throws Exception
+	 */
 	public MessageReceiver(final Socket socket) throws Exception {
 		this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-	}
-
-	public final boolean hasMore() {
-		return (null != this.receivedMessages.peek());
-	}
-
-	public final ChatMessage read() {
-		return this.receivedMessages.poll();
 	}
 
 	@Override
@@ -35,7 +34,6 @@ public class MessageReceiver extends Thread implements Closeable {
 				String line;
 				while ((line = reader.readLine()) != null) {
 					final ChatMessage chatMessage = ChatMessage.fromXML(line);
-					receivedMessages.add(chatMessage);
 					System.out.println(chatMessage.getUserDn() + "@" + chatMessage.getClearanceLevel().getLevel()
 							+ " says: " + chatMessage.getMessage());
 				}

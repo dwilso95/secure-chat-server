@@ -8,12 +8,20 @@ import java.util.Base64;
 
 import javax.net.ssl.SSLSocket;
 
+import chat.ChatContext;
 import chat.SSLFactory;
 import chat.SignatureFactory;
 import chat.clearance.ClearanceLevel;
 import chat.message.ChatMessage;
 import chat.server.User;
 
+/**
+ * Chat client. Requires a {@link ChatContext} which defines properties of the
+ * client.
+ * 
+ * Client handles reading and writing data from/to Server.
+ * 
+ */
 public class Client implements Runnable, Closeable {
 
 	private final SSLSocket socket;
@@ -22,7 +30,15 @@ public class Client implements Runnable, Closeable {
 	private User user;
 	private Signature signature;
 
-	public Client(final ClientContext clientContext) throws Exception {
+	/**
+	 * Creates a Client using a {@link ChatContext} for all configuration
+	 * information
+	 * 
+	 * @param clientContext
+	 *            - {@link ChatContext}
+	 * @throws Exception
+	 */
+	public Client(final ChatContext clientContext) throws Exception {
 		this.signature = SignatureFactory.createSignatureForSigning(clientContext);
 		this.socket = SSLFactory.getSSLSocket(clientContext);
 		this.sender = new MessageSender(this.socket);
@@ -30,18 +46,28 @@ public class Client implements Runnable, Closeable {
 		this.user = new User(clientContext.getProperty("dn"));
 	}
 
-	public final boolean hasMore() {
-		return this.receiver.hasMore();
-	}
-
-	public final ChatMessage read() {
-		return this.receiver.read();
-	}
-
+	/**
+	 * Writes the given message at the given level to the chat server
+	 * 
+	 * @param message
+	 *            - message to write
+	 * @param level
+	 *            - level at which to write the message
+	 * @throws IOException
+	 * @throws SignatureException
+	 */
 	public final void write(final String message, final int level) throws IOException, SignatureException {
 		this.write(new ChatMessage(message, new ClearanceLevel(level), "signature", user.getUserDn()));
 	}
 
+	/**
+	 * Writes the given message to the chat server
+	 * 
+	 * @param chatMessage
+	 *            - the message to write to the server
+	 * @throws IOException
+	 * @throws SignatureException
+	 */
 	public final void write(final ChatMessage chatMessage) throws IOException, SignatureException {
 		signature.update(chatMessage.getMessage().getBytes());
 		final byte[] signatureBytes = signature.sign();

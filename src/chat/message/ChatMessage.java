@@ -12,6 +12,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import chat.clearance.ClearanceLevel;
 
+/**
+ * Object for handling messages between client and server.
+ * 
+ * Contains the message, the clearance level of the message, the user's dn which
+ * sent the message, and a signature based on the message.
+ */
 @XmlRootElement
 public class ChatMessage {
 
@@ -20,10 +26,25 @@ public class ChatMessage {
 	private String signature;
 	private String userDn;
 
+	/**
+	 * Empty default constructor. Required for simple JAXB marshaling.
+	 */
 	public ChatMessage() {
 
 	}
 
+	/**
+	 * Constructor which defines all fields of the instance.
+	 * 
+	 * @param message
+	 *            - String
+	 * @param clearanceLevel
+	 *            - {@link ClearanceLevel}
+	 * @param signature
+	 *            - Base64 encoded signature of included message
+	 * @param userDn
+	 *            - Dn of the user who send the message
+	 */
 	public ChatMessage(final String message, final ClearanceLevel clearanceLevel, final String signature,
 			final String userDn) {
 		this.message = message;
