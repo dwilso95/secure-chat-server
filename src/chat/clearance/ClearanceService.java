@@ -9,7 +9,7 @@ import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import chat.server.User;
+import chat.User;
 
 /**
  * Handles {@link ClearanceLevel}s of {@link User}s.

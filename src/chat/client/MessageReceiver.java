@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
-import chat.message.ChatMessage;
+import chat.ChatMessage;
 
 /**
  * Thread for reading {@link ChatMessage}s from the chat server and prints it to

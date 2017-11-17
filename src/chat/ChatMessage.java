@@ -1,4 +1,4 @@
-package chat.message;
+package chat;
 
 import java.io.StringReader;
 import java.io.StringWriter;

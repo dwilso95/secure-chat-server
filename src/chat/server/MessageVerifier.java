@@ -4,9 +4,10 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.util.Base64;
 
+import chat.ChatMessage;
+import chat.User;
 import chat.clearance.ClearanceLevel;
 import chat.clearance.ClearanceService;
-import chat.message.ChatMessage;
 
 public class MessageVerifier {
 

@@ -9,11 +9,11 @@ import java.util.Base64;
 import javax.net.ssl.SSLSocket;
 
 import chat.ChatContext;
+import chat.ChatMessage;
 import chat.SSLFactory;
 import chat.SignatureFactory;
+import chat.User;
 import chat.clearance.ClearanceLevel;
-import chat.message.ChatMessage;
-import chat.server.User;
 
 /**
  * Chat client. Requires a {@link ChatContext} which defines properties of the

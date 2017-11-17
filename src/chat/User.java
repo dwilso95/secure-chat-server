@@ -1,9 +1,18 @@
-package chat.server;
+package chat;
 
+/**
+ * Class for holding information about a given user
+ */
 public class User {
 
 	private String userDn;
 
+	/**
+	 * Creates a user
+	 * 
+	 * @param userDn
+	 *            - String
+	 */
 	public User(final String userDn) {
 		this.userDn = userDn;
 	}

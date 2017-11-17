@@ -11,6 +11,13 @@ import chat.ChatContext;
 import chat.SSLFactory;
 import chat.clearance.ClearanceService;
 
+/**
+ * Chat server for handling messages from some number of chat clients.
+ * 
+ * Spawns multiple threads for each client connection in order to be
+ * non-blocking.
+ * 
+ */
 public class Server implements Runnable {
 
 	private final ChatContext serverContext;
@@ -18,6 +25,12 @@ public class Server implements Runnable {
 	private final ClearanceService clearanceService;
 	private final List<Thread> serverThreads = new ArrayList<>();
 
+	/**
+	 * Creates an instance using the given context
+	 * 
+	 * @param serverContext
+	 *            - {@link ChatContext}
+	 */
 	public Server(final ChatContext serverContext) {
 		try {
 			this.clearanceService = new ClearanceService(new File(serverContext.getProperty("clearance.file")));

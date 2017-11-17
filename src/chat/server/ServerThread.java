@@ -5,8 +5,6 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.security.Signature;
 import java.time.ZonedDateTime;
 import java.util.Queue;
@@ -18,9 +16,13 @@ import java.util.logging.SimpleFormatter;
 import javax.net.ssl.SSLSocket;
 
 import chat.ChatContext;
+import chat.ChatMessage;
 import chat.SignatureFactory;
-import chat.message.ChatMessage;
+import chat.User;
 
+/**
+ * Thread which handles all communication for specific user's socket connection
+ */
 public class ServerThread extends Thread implements Runnable, Closeable {
 
 	private static final Logger LOGGER = Logger.getLogger(ServerThread.class.getName());
@@ -44,8 +46,19 @@ public class ServerThread extends Thread implements Runnable, Closeable {
 	private Signature signature;
 	private boolean runServerThread = true;
 
+	/**
+	 * Creates an instance for the given socket
+	 * 
+	 * @param socket
+	 *            - {@link SSLSocket}
+	 * @param messageVerifier
+	 *            - {@link MessageVerifier}
+	 * @param serverContext
+	 *            - {@link ChatContext}
+	 * @throws Exception
+	 */
 	public ServerThread(final SSLSocket socket, final MessageVerifier messageVerifier, final ChatContext serverContext)
-			throws IOException, InvalidKeyException, NoSuchAlgorithmException {
+			throws Exception {
 		this.socket = socket;
 		this.messageVerifier = messageVerifier;
 		this.user = new User(socket.getSession().getPeerPrincipal().toString());

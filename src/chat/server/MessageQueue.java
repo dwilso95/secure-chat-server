@@ -6,7 +6,8 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import chat.message.ChatMessage;
+import chat.ChatMessage;
+import chat.User;
 
 /**
  * Singleton used for transferring {@link ChatMessage}s between

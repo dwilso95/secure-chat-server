@@ -7,7 +7,7 @@ import java.net.Socket;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import chat.message.ChatMessage;
+import chat.ChatMessage;
 
 /**
  * Thread which handles writing messages to a chat server over a socket
