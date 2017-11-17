@@ -101,7 +101,6 @@ public class ServerThread extends Thread implements Runnable, Closeable {
 						final ChatMessage chatMessage = ChatMessage.fromXML(line);
 						// we can check if the user could send this message by just checking if the user
 						// could receive this message
-						System.out.println(messageVerifier.verifyMessageSignature(chatMessage, signature));
 						if (messageVerifier.verifyMessageSignature(chatMessage, signature)
 								&& messageVerifier.verifyMessageDestination(chatMessage, user)) {
 							MessageQueue.getInstance().addMessageToQueues(chatMessage, user);
