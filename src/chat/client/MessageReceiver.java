@@ -20,7 +20,7 @@ public class MessageReceiver extends Thread implements Closeable {
 	/**
 	 * Creates an instance which reads from the given socket
 	 * 
-	 * @param socket
+	 * @param socket - the socket from which to read 
 	 * @throws Exception
 	 */
 	public MessageReceiver(final Socket socket) throws Exception {

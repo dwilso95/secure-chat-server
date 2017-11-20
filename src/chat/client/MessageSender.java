@@ -21,7 +21,7 @@ public class MessageSender extends Thread implements Closeable {
 	/**
 	 * Creates an instance which writes over the given socket
 	 * 
-	 * @param socket
+	 * @param socket - the socket for which to write
 	 * @throws Exception
 	 */
 	public MessageSender(final Socket socket) throws Exception {

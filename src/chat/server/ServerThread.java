@@ -21,12 +21,15 @@ import chat.SignatureFactory;
 import chat.User;
 
 /**
- * Thread which handles all communication for specific user's socket connection
+ * Thread which handles all communication for specific user's socket connection.
+ * 
+ * This class has two inner classes, one for reading and one for writing.
  */
 public class ServerThread extends Thread implements Runnable, Closeable {
 
 	private static final Logger LOGGER = Logger.getLogger(ServerThread.class.getName());
 
+	// Static method for configuring the server's logger
 	static {
 		try {
 			final FileHandler fh = new FileHandler("ChatServer_" + ZonedDateTime.now().toEpochSecond() + ".log");
@@ -67,14 +70,15 @@ public class ServerThread extends Thread implements Runnable, Closeable {
 		this.writer = new PrintStream(socket.getOutputStream());
 		this.signature = SignatureFactory
 				.createSignatureForVerification(socket.getSession().getPeerCertificateChain()[0].getPublicKey());
+
 	}
 
 	public void run() {
 		// start receiver
-		new Thread(new ReceiverThread()).start();
+		new ReaderThread().start();
 
 		// start sender
-		new Thread(new SenderThread()).start();
+		new WriterThread().start();
 	}
 
 	@Override
@@ -84,9 +88,13 @@ public class ServerThread extends Thread implements Runnable, Closeable {
 		this.writer.close();
 	}
 
-	class ReceiverThread implements Runnable, Closeable {
+	/**
+	 * Inner class for reading messages from the connected client. This implements
+	 * its own thread so reading is non blocking.
+	 */
+	class ReaderThread extends Thread implements Runnable {
 
-		public ReceiverThread() {
+		public ReaderThread() {
 		}
 
 		@Override
@@ -116,16 +124,13 @@ public class ServerThread extends Thread implements Runnable, Closeable {
 			}
 		}
 
-		@Override
-		public void close() throws IOException {
-			reader.close();
-		}
 	}
 
-	class SenderThread implements Runnable, Closeable {
-
-		public SenderThread() {
-		}
+	/**
+	 * Inner class for writing messages to the connected client. This implements its
+	 * own thread so reading is non blocking.
+	 */
+	class WriterThread extends Thread implements Runnable {
 
 		@Override
 		public void run() {
@@ -142,11 +147,6 @@ public class ServerThread extends Thread implements Runnable, Closeable {
 					}
 				}
 			}
-		}
-
-		@Override
-		public void close() throws IOException {
-			writer.close();
 		}
 
 	}
