@@ -26,7 +26,7 @@ public class MessageReceiver extends Thread implements Closeable {
 	public MessageReceiver(final Socket socket) throws Exception {
 		this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 	}
-
+	
 	@Override
 	public void run() {
 		while (this.runReceiver) {
@@ -38,7 +38,7 @@ public class MessageReceiver extends Thread implements Closeable {
 							+ " says: " + chatMessage.getMessage());
 				}
 			} catch (IOException e) {
-				runReceiver = false;
+				this.runReceiver = false;
 			}
 		}
 	}

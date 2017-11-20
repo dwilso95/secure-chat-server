@@ -36,16 +36,13 @@ public class MessageSender extends Thread implements Closeable {
 	public void send(final ChatMessage chatMessage) {
 		this.messagesToWrite.add(chatMessage);
 	}
-
+	
 	@Override
 	public void run() {
 		try {
 			while (this.runSender) {
 				if (this.messagesToWrite.peek() != null) {
 					final ChatMessage chatMessage = messagesToWrite.poll();
-					// System.out.println("Client [" + dn + "] writing: " + chatMessage.getMessage()
-					// + " with level: "
-					// + chatMessage.getClearanceLevel());
 					this.writer.println(ChatMessage.toXML(chatMessage));
 				}
 			}

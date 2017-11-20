@@ -1,4 +1,4 @@
-"dn"="CN=Client 2, OU=APL, O=JHU, L=Laurel, ST=Maryland, C=US=4"
+"dn"="CN=Client 2, OU=APL, O=JHU, L=Laurel, ST=Maryland, C=US"
 port=5000
 keystore=client/stores/client2_ks.jks
 truststore=client/stores/client2_ts.jks

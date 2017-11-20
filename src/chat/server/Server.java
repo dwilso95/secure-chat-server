@@ -1,8 +1,6 @@
 package chat.server;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLSocket;
@@ -23,7 +21,6 @@ public class Server implements Runnable {
 	private final ChatContext serverContext;
 	private final SSLServerSocket secureSocketServer;
 	private final ClearanceService clearanceService;
-	private final List<Thread> serverThreads = new ArrayList<>();
 
 	/**
 	 * Creates an instance using the given context
@@ -48,14 +45,12 @@ public class Server implements Runnable {
 		while (true) {
 			try {
 				final SSLSocket socket = (SSLSocket) this.secureSocketServer.accept();
-				final Thread serverThread = new ServerThread(socket, new MessageVerifier(this.clearanceService),
-						this.serverContext);
-				serverThread.start();
-				this.serverThreads.add(serverThread);
+				new ServerThread(socket, new MessageVerifier(this.clearanceService), this.serverContext).start();
 			} catch (Exception e) {
 				throw new RuntimeException("Problem creating server thread for client connection...", e);
 			}
 		}
+
 	}
 
 }

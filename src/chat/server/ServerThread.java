@@ -1,7 +1,6 @@
 package chat.server;
 
 import java.io.BufferedReader;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -25,7 +24,7 @@ import chat.User;
  * 
  * This class has two inner classes, one for reading and one for writing.
  */
-public class ServerThread extends Thread implements Runnable, Closeable {
+public class ServerThread extends Thread implements Runnable {
 
 	private static final Logger LOGGER = Logger.getLogger(ServerThread.class.getName());
 
@@ -45,6 +44,7 @@ public class ServerThread extends Thread implements Runnable, Closeable {
 	private final MessageVerifier messageVerifier;
 	private final BufferedReader reader;
 	private final PrintStream writer;
+	private Long lastMessageTime;
 	private User user;
 	private Signature signature;
 	private boolean runServerThread = true;
@@ -62,26 +62,38 @@ public class ServerThread extends Thread implements Runnable, Closeable {
 	 */
 	public ServerThread(final SSLSocket socket, final MessageVerifier messageVerifier, final ChatContext serverContext)
 			throws Exception {
+		this.timeout = Integer.parseInt(serverContext.getProperty("timeout"));
 		this.socket = socket;
 		this.messageVerifier = messageVerifier;
 		this.user = new User(socket.getSession().getPeerPrincipal().toString());
-		this.timeout = Long.parseLong(serverContext.getProperty("timeout"));
 		this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		this.writer = new PrintStream(socket.getOutputStream());
 		this.signature = SignatureFactory
-				.createSignatureForVerification(socket.getSession().getPeerCertificateChain()[0].getPublicKey());
-
+				.createSignatureForVerification(socket.getSession().getPeerCertificates()[0].getPublicKey());
+		this.lastMessageTime = System.currentTimeMillis();
 	}
 
 	public void run() {
 		// start receiver
 		new ReaderThread().start();
-
 		// start sender
 		new WriterThread().start();
+
+		while (this.runServerThread) {
+			if (System.currentTimeMillis() - this.lastMessageTime > this.timeout) {
+				this.runServerThread = false;
+			}
+		}
+
+		try {
+			this.close();
+		} catch (final IOException e) {
+			System.out.println("Error closing ServerThread, cause by: ");
+			e.printStackTrace();
+		}
+
 	}
 
-	@Override
 	public void close() throws IOException {
 		this.socket.close();
 		this.reader.close();
@@ -99,7 +111,6 @@ public class ServerThread extends Thread implements Runnable, Closeable {
 
 		@Override
 		public void run() {
-			Long lastMessageTime = System.currentTimeMillis();
 			while (runServerThread) {
 				try {
 					String line;
@@ -111,14 +122,11 @@ public class ServerThread extends Thread implements Runnable, Closeable {
 						// could receive this message
 						if (messageVerifier.verifyMessageSignature(chatMessage, signature)
 								&& messageVerifier.verifyMessageDestination(chatMessage, user)) {
+							chatMessage.setSignature("");
 							MessageQueue.getInstance().addMessageToQueues(chatMessage, user);
 						}
 					}
-					if (System.currentTimeMillis() - lastMessageTime > timeout) {
-						runServerThread = false;
-					}
 				} catch (IOException e) {
-					e.printStackTrace();
 					runServerThread = false;
 				}
 			}
